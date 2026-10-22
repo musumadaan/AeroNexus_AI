@@ -1,0 +1,11 @@
+# core (everything needed for tests, evals, the demo and training on public data; CPU, offline after fetch)
+fastapi>=0.115
+strawberry-graphql[fastapi]>=0.250
+uvicorn[standard]>=0.30
+httpx>=0.27
+numpy>=1.26
+pandas>=2.2
+scikit-learn>=1.5
+joblib>=1.4
+python-multipart>=0.0.9
+pytest>=8

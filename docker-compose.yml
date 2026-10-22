@@ -1,0 +1,27 @@
+# docker compose up --build          → app on http://localhost:3000 (Groq Llama if backend/.env has GROQ_API_KEY;
+#                                       without a key the app still works: rules + extractive answers + human review)
+# docker compose --profile llm up    → also starts Ollama; then set AERONEXUS_LLM_PROVIDER=ollama
+services:
+  api:
+    build: ./backend
+    env_file: [{path: ./backend/.env, required: false}]   # GROQ_API_KEY lives here (git-ignored)
+    environment:
+      AERONEXUS_LLM_PROVIDER: ${AERONEXUS_LLM_PROVIDER:-groq}
+      AERONEXUS_JUDGE_PROVIDER: ${AERONEXUS_JUDGE_PROVIDER:-groq}
+      OLLAMA_URL: http://ollama:11434
+      AERONEXUS_CORS: http://localhost:3000
+    volumes:
+      - state:/app/state                  # durable case/workflow event log
+    ports: ["8000:8000"]
+  web:
+    build: ./frontend
+    depends_on: [api]
+    ports: ["3000:80"]
+  ollama:
+    image: ollama/ollama:latest
+    profiles: ["llm"]
+    volumes: ["ollama:/root/.ollama"]
+    ports: ["11434:11434"]
+volumes:
+  ollama: {}
+  state: {}
